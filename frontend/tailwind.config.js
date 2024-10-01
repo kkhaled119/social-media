@@ -1,11 +1,11 @@
-// tailwind.config.js
 module.exports = {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}", // جميع الملفات داخل مجلد src
-    "./public/index.html", // في حالة وجود ملف HTML في المجلد public
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./public/index.html",
+    "node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require("flowbite/plugin")],
 };

@@ -1,11 +1,11 @@
 {
-  "name": "socialmedia",
+  "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon backend/index.js",
-    "start": "node backend/index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",

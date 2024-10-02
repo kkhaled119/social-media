@@ -1,8 +1,49 @@
-import React from "react";
-import { Button, Label, TextInput } from "flowbite-react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const [formData, setFormData] = useState({});
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handelChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+  };
+
+  const handelSubmit = async (e) => {
+    e.preventDefault();
+    // Ensure all fields are filled out
+    if (!formData.userName || !formData.email || !formData.password) {
+      return setErrorMessage("Please fill out all fields");
+    }
+
+    try {
+      setLoading(true);
+      setErrorMessage(null);
+      const res = await fetch("/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      // Handle any API errors
+      if (!res.ok) {
+        setLoading(false);
+        return setErrorMessage(data.message || "Signup failed");
+      }
+
+      setLoading(false);
+      navigate("/sign-in");
+    } catch (error) {
+      setErrorMessage(error.message || "An unexpected error occurred");
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen mt-20">
       <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-6">
@@ -22,28 +63,47 @@ const SignUp = () => {
 
         {/* Right Side */}
         <div className="flex-1">
-          <form className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handelSubmit}>
             <div className="">
               <Label value="Your username" />
-              <TextInput type="text" placeholder="Username" id="username" />
+              <TextInput
+                type="text"
+                placeholder="Username"
+                id="userName"
+                onChange={handelChange}
+              />
             </div>
             <div className="mb-4">
               <Label value="Your email" />
               <TextInput
                 type="email"
-                placeholder="name@comapany.com"
+                placeholder="name@company.com"
                 id="email"
+                onChange={handelChange}
               />
             </div>
             <div className="mb-4">
               <Label value="Your password" />
-              <TextInput type="password" placeholder="Password" id="password" />
+              <TextInput
+                type="password"
+                placeholder="Password"
+                id="password"
+                onChange={handelChange}
+              />
             </div>
             <Button
               className="bg-gradient-to-r from-slate-700 to-green-500 rounded-xl text-white"
               type="submit"
+              disabled={loading}
             >
-              Sign Up
+              {loading ? (
+                <>
+                  <Spinner size="sm" />
+                  <span className="pl-3">Loading...</span>
+                </>
+              ) : (
+                "Sign Up"
+              )}
             </Button>
           </form>
           <div className="flex gap-2 text-sm mt-5">
@@ -52,6 +112,11 @@ const SignUp = () => {
               Sign In
             </Link>
           </div>
+          {errorMessage && (
+            <Alert className="mt-5" color="failure">
+              {errorMessage}
+            </Alert>
+          )}
         </div>
       </div>
     </div>
